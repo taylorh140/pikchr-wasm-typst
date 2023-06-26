@@ -1,0 +1,3 @@
+[submodule "pikchr"]
+	path = pikchr
+	url = https://github.com/drhsqlite/pikchr.git
