@@ -31,4 +31,9 @@ for _ in re.findall(r"(\(import [^\(]+\(func \(;(\d+);\) \(type (\d+)\)\)\))",wa
         print("replacing:",_[0],"with",rep)
     wat=wat.replace(_[0],rep)
 
+
+wat = wat.replace("wasm_minimal_protocol_internal_function_get_storage_pointer","wasm_minimal_protocol::get_storage_pointer")
+wat = wat.replace("wasm_minimal_protocol_internal_function_allocate_storage","wasm_minimal_protocol::allocate_storage")
+wat = wat.replace("wasm_minimal_protocol_internal_function_get_storage_len","wasm_minimal_protocol::get_storage_len")
+
 Path('pikchrNoImp.wat').write_text(wat)

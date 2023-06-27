@@ -1,3 +1,6 @@
 [submodule "pikchr"]
 	path = pikchr
 	url = https://github.com/drhsqlite/pikchr.git
+[submodule "wasm-minimal-protocol"]
+	path = wasm-minimal-protocol
+	url = https://github.com/astrale-sharp/wasm-minimal-protocol.git
