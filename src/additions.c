@@ -4,13 +4,6 @@ __attribute__((import_module("typst_env"))) extern void wasm_minimal_protocol_se
 
 __attribute__((import_module("typst_env"))) extern void wasm_minimal_protocol_write_args_to_buffer(uint8_t* ptr);
 
-typedef struct {
-    uint8_t* ptr;
-    size_t cap;
-    size_t len;
-} RustString;
-
-
 //Need the prototype for forward reference.
 char *pikchr(
   const char *zText,     /* Input PIKCHR source text.  zero-terminated */
@@ -29,13 +22,18 @@ int PikchrRender(size_t len){
     wasm_minimal_protocol_write_args_to_buffer((uint8_t *)inputbuffer);
     inputbuffer[len] = 0;
 
-    char * data = pikchr(inputbuffer,0,0,0,0);                            // call function
+    int pnWidth;   /* holds returned width of svg */
+    int pnHeight;  /* holds returned height of svg */
+
+    char * data = pikchr(inputbuffer,0,0,&pnWidth,&pnHeight);                            // call function
 
     free(inputbuffer);                                                    // I dont need the memory anymore
 
     wasm_minimal_protocol_send_result_to_host( (uint8_t*) data, strlen(data));
 
     free(data);
-    return 0; // this indicates that everything is fine
+
+    if (pnWidth>0) return 0; // this indicates that everything is fine
+    return 1; //error has occured.
 }
 
