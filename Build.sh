@@ -2,19 +2,11 @@
 
 ./Insert.sh
 
-emcc pikchr.c -o pikchr.wasm -s EXPORTED_FUNCTIONS=["_PikchrRender","_wasm_minimal_protocol_internal_function_get_storage_pointer","_wasm_minimal_protocol_internal_function_allocate_storage","_wasm_minimal_protocol_internal_function_get_storage_len"] --no-entry
+emcc pikchr.c --target=wasm32-unknown-unknown -s ERROR_ON_UNDEFINED_SYMBOLS=0 -o pikchr.wasm -s STANDALONE_WASM=1 -s EXPORTED_FUNCTIONS=["_PikchrRender"] --no-entry
 
 # for getting wat represntation.
 wasm2wat pikchr.wasm -o pikchr.wat
 
 ./Patch.sh
 
-wat2wasm pikchrNoImp.wat -o pikchrNoImp.wasm
-
-
-#for testing
-cp pikchrNoImp.wasm ../TestGround/
-cd ../TestGround
-./testpik.sh
-
-cd ../pkchr-wasm-typst
+wat2wasm pikchr_patched.wat -o pikchr.wasm

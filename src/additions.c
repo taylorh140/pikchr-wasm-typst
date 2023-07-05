@@ -1,28 +1,8 @@
-typedef struct {
-    uint8_t* ptr;
-    size_t cap;
-    size_t len;
-} Vector;
+#include <stdint.h>
 
-static Vector __RESULT = { NULL, 0, 0 };
+__attribute__((import_module("typst_env"))) extern void wasm_minimal_protocol_send_result_to_host(uint8_t const* ptr, size_t len);
 
-uint8_t* wasm_minimal_protocol_internal_function_get_storage_pointer() {
-    return __RESULT.ptr;
-}
-
-void wasm_minimal_protocol_internal_function_allocate_storage(size_t length) {
-    // Clear the existing storage
-    free(__RESULT.ptr);
-    
-    // Allocate new storage
-    __RESULT.ptr = (uint8_t*)malloc(length * sizeof(uint8_t));
-    __RESULT.len = length;
-    __RESULT.cap = length;
-}
-
-size_t wasm_minimal_protocol_internal_function_get_storage_len() {
-    return __RESULT.cap;
-}
+__attribute__((import_module("typst_env"))) extern void wasm_minimal_protocol_write_args_to_buffer(uint8_t* ptr);
 
 typedef struct {
     uint8_t* ptr;
@@ -40,25 +20,22 @@ char *pikchr(
   int *pnHeight          /* OUT: Write height here, if not NULL */
 );
 
-void PikchrRender(RustString * Input){
+int PikchrRender(size_t len){
 
     //Convert input string
-    char * inputbuffer = (char *)calloc( __RESULT.len+1 , sizeof(uint8_t)); //guarentee null byte ending
-    memcpy(inputbuffer,__RESULT.ptr,__RESULT.len);                            // copy all but the last byte
+
+    char * inputbuffer = (char *)calloc( len+1 , sizeof(char)); //guarantee null byte ending
+
+    wasm_minimal_protocol_write_args_to_buffer((uint8_t *)inputbuffer);
+    inputbuffer[len] = 0;
 
     char * data = pikchr(inputbuffer,0,0,0,0);                            // call function
+
     free(inputbuffer);                                                    // I dont need the memory anymore
 
-    //data=inputbuffer;
-    __RESULT.ptr=(char*)data;
-    __RESULT.len=strlen(data); //get length of output string
-    __RESULT.cap= __RESULT.len;                           
+    wasm_minimal_protocol_send_result_to_host( (uint8_t*) data, strlen(data));
 
-    // RustString * rtn = (RustString*)malloc(sizeof(RustString));           //get memory to send across barrier
-    // rtn->cap=rtnlen+1;
-    // rtn->len=rtnlen;
-    // rtn->ptr=(uint8_t*)data; //same as a char pointer...
-
-    // return rtn;
+    free(data);
+    return 0; // this indicates that everything is fine
 }
 

@@ -27,13 +27,12 @@ for _ in re.findall(r"(\(import [^\(]+\(func \(;(\d+);\) \(type (\d+)\)\)\))",wa
 
     rep=f"(func (;{_[1]};) {types[_[2]][0]} {types[_[2]][1]} {'' if types[_[2]][2]=='' else types[_[2]][2]+'.const 0 return '} )"
 
+    if "\"typst_env\"" in _[0]:
+        continue
+
     if _[0] in wat:
         print("replacing:",_[0],"with",rep)
     wat=wat.replace(_[0],rep)
 
 
-wat = wat.replace("wasm_minimal_protocol_internal_function_get_storage_pointer","wasm_minimal_protocol::get_storage_pointer")
-wat = wat.replace("wasm_minimal_protocol_internal_function_allocate_storage","wasm_minimal_protocol::allocate_storage")
-wat = wat.replace("wasm_minimal_protocol_internal_function_get_storage_len","wasm_minimal_protocol::get_storage_len")
-
-Path('pikchrNoImp.wat').write_text(wat)
+Path('pikchr_patched.wat').write_text(wat)
